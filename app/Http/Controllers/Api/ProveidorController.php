@@ -18,7 +18,7 @@ class ProveidorController extends Controller
         //
         $proveidor = Proveidor::all();
 
-        if (!$proveidor) {
+        if (count($proveidor) == 0) {
             return response()->json([
                 'success' => false,
                 'message' => 'No proveidors'
@@ -81,8 +81,7 @@ class ProveidorController extends Controller
         //
         $proveidor = Proveidor::where('id', $id)->get();
 
-        //si no hay atributos quiere decir que el registro no existe en la BBDD
-        if ($proveidor[0]->attributes) {
+        if (count($proveidor) == 0) {
             return response()->json([
                 'success' => false,
                 'message' => 'Proveidor with id ' . $id . ' not found'
@@ -128,7 +127,7 @@ class ProveidorController extends Controller
         $proveidor->city = $validated['city'];
         $proveidor->speciality = $validated['speciality'];
 
-        if (!$proveidor->update($request->all())) {
+        if (!$proveidor->update($validated)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Proveidor with id ' . $id . ' can not be updated'
@@ -152,7 +151,7 @@ class ProveidorController extends Controller
         //
         $proveidor = Proveidor::where('id', $id)->delete();
 
-        if (!$proveidor) {
+        if (count($proveidor) == 0) {
             return response()->json([
                 'success' => false,
                 'message' => 'Proveidor with id ' . $id . ' not found'

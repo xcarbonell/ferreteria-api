@@ -24,6 +24,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('user', [AuthController::class, 'user']);
     //posar rutes aixi
     Route::resource('products', 'Api\ProductController');
+    Route::resource('proveidors', 'Api\ProveidorController');
 });
 
 Route::post('login', [AuthController::class, 'login']);
