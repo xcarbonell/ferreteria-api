@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Proveidor;
 use Illuminate\Http\Request;
-use App\Product;
 
-class ProductController extends Controller
+class ProveidorController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,18 +16,18 @@ class ProductController extends Controller
     public function index()
     {
         //
-        $products = Product::all();
+        $proveidor = Proveidor::all();
 
-        if (!$products) {
+        if (!$proveidor) {
             return response()->json([
                 'success' => false,
-                'message' => 'No products'
+                'message' => 'No proveidors'
             ], 200);
         }
 
         return response()->json([
             'success' => true,
-            'data' => $products->toArray()
+            'data' => $proveidor->toArray()
         ], 200);
     }
 
@@ -39,7 +39,6 @@ class ProductController extends Controller
     public function create()
     {
         //
-        return Product::all();
     }
 
     /**
@@ -51,11 +50,24 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         //
-        $product = new Product;
-        //Declarem el nom amb el request
-        $product->name = $request->name;
-        //Desem els canvis
-        $product->save();
+        $validated = $request->validate([
+            'name' => 'required|max:50',
+            'city' => 'required|max:50',
+            'speciality' => 'required|max:50'
+        ]);
+
+        $proveidor = Proveidor::create([
+            'name' => $validated['name'],
+            'city' => $validated['city'],
+            'speciality' => $validated['speciality']
+        ]);
+
+        if ($proveidor->save()) {
+            return response()->json([
+                'success' => true,
+                'data' => 'Proveidor saved'
+            ], 200);
+        }
     }
 
     /**
@@ -67,20 +79,19 @@ class ProductController extends Controller
     public function show($id)
     {
         //
-        //return Product::where('id', $id)->get();
+        $proveidor = Proveidor::where('id', $id)->get();
 
-        $product = Product::where('id', $id)->get();
-
-        if (count($product) == 0) {
+        //si no hay atributos quiere decir que el registro no existe en la BBDD
+        if ($proveidor[0]->attributes) {
             return response()->json([
                 'success' => false,
-                'message' => 'Product with id ' . $id . ' not found'
+                'message' => 'Proveidor with id ' . $id . ' not found'
             ], 200);
         }
 
         return response()->json([
             'success' => true,
-            'data' => $product->toArray()
+            'data' => $proveidor->toArray()
         ], 200);
     }
 
@@ -105,24 +116,28 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         //
-        $product = Product::find($id);
+        $proveidor = Proveidor::find($id);
 
         $validated = $request->validate([
-            'name' => 'required|max:50'
+            'name' => 'required|max:50',
+            'city' => 'required|max:255',
+            'speciality' => 'required|max:50'
         ]);
 
-        $product->name = $validated['name'];
+        $proveidor->name = $validated['name'];
+        $proveidor->city = $validated['city'];
+        $proveidor->speciality = $validated['speciality'];
 
-        if (!$product->update($validated)) {
+        if (!$proveidor->update($request->all())) {
             return response()->json([
                 'success' => false,
-                'message' => 'Product with id ' . $id . ' can not be updated'
+                'message' => 'Proveidor with id ' . $id . ' can not be updated'
             ], 200);
         }
 
         return response()->json([
             'success' => true,
-            'data' => 'Product updated'
+            'data' => 'Proveidor updated'
         ], 200);
     }
 
@@ -135,18 +150,18 @@ class ProductController extends Controller
     public function destroy($id)
     {
         //
-        $product = Product::where('id', $id)->delete();
+        $proveidor = Proveidor::where('id', $id)->delete();
 
-        if (!$product) {
+        if (!$proveidor) {
             return response()->json([
                 'success' => false,
-                'message' => 'Product with id ' . $id . ' not found'
+                'message' => 'Proveidor with id ' . $id . ' not found'
             ], 200);
         }
 
         return response()->json([
             'success' => true,
-            'data' => 'Product deleted'
+            'data' => 'Proveidor deleted'
         ], 200);
     }
 }
